@@ -1,568 +1,71 @@
-#include <iostream>
-#include <cstdlib>
-#include <stdlib.h>
-#define LINE_MAX 1024
-#include <fstream>
+#include<iostream>
+#include<cstdlib>
+#include<algorithm>
+#include<vector>
+#include<deque>
+#define LINE_MAX 30
+
 using namespace std;
+
 struct node{
-int arrival;
-int burst;
-int processno;
-int completiontime;
-int priority;
-int turnAround;
-int waiting;
-node* next;
-node* prev;
+       int id,
+           arrive,
+           burst,
+           priority,
+           waiting,
+           turnaroundtime;
+          
+           
+  
+       node() : id(0), arrive(0), burst(0), priority(0), waiting(0), turnaroundtime(0){};
 };
-struct node* createNode(int processes, int arrivaltime, int bursttime, int prioritytime){
-struct node* temp;
-temp = (struct node*) malloc(sizeof(node));
-temp->processno = processes;
-temp->arrival = arrivaltime;
-temp->burst = bursttime;
-temp->priority = prioritytime;
-temp->next = NULL;
-temp->prev = NULL;
-return temp;
-}
-struct node* insertBack(struct node* header,int processes, int arrivaltime, int bursttime, int prioritytime){
-struct node* temp = createNode(processes, arrivaltime,  bursttime, prioritytime);
-struct node* headertemp;
-if(header == NULL){
-header = temp;
-return header;
-}
 
-headertemp = header;
-while(headertemp->next!=NULL)
-headertemp = headertemp->next;
-headertemp->next = temp;
-temp->prev = headertemp;
-return header;
-
-
-}
-
-int is_empty(struct node *header){
-	if(header==NULL){
-		return 1;
-	
-	}
-	else 
-	return 0;
-}
-struct node* sortArrival(struct node* header ){
-	struct node* temp = header;
-	struct node* i = temp;
-	struct node* j = temp->next;
-	for(i=temp; i != NULL; i = i->next){
-		for(j=i->next; j != NULL; j = j->next){
-			if(((i->arrival)) > ((j->arrival))){
-			
-			struct node* temp2 = createNode(i->processno, i->arrival, i->burst, i->priority);
-			i->processno = j->processno;
-			i->arrival = j->arrival;
-			i->burst = j->burst;
-			i->priority = j->priority;
-			i->waiting = j->waiting;
-			i->turnAround = j->turnAround;
-			i->completiontime = j->completiontime;
-			
-			j->processno = temp2->processno;
-			j->arrival = temp2->arrival;
-			j->burst = temp2->burst;
-			j->priority = temp2->priority;
-				j->waiting = temp2->waiting;
-			j->turnAround = temp2->turnAround;
-			j->completiontime = temp2->completiontime;
-		}
-		}
-	}
-	return temp;
-}
-struct node* sortProcess(struct node* header){
-	struct node* temp = header;
-	struct node* i = temp;
-	struct node* j = temp->next;
-	for(i=temp; i != NULL; i = i->next){
-		for(j=i->next; j!=NULL; j=j->next){
-			if(((i->processno)) > ((j->processno))){
-					struct node* temp2 = createNode(i->processno, i->arrival, i->burst, i->priority);
-			i->processno = j->processno;
-			i->arrival = j->arrival;
-			i->burst = j->burst;
-			i->priority = j->priority;
-				i->waiting = j->waiting;
-			i->turnAround = j->turnAround;
-			i->completiontime = j->completiontime;
-			
-			j->processno = temp2->processno;
-			j->arrival = temp2->arrival;
-			j->burst = temp2->burst;
-			j->priority = temp2->priority;
-				j->waiting = temp2->waiting;
-			j->turnAround = temp2->turnAround;
-			j->completiontime = temp2->completiontime;
-			}
-			
-		}
-	}
-}
-struct node* sortBurstime(struct node* header){
-		struct node* temp = header;
-	struct node* i = temp;
-	struct node* j = temp->next;
-	int bursttime;
-	int min = 0;
-
-	for(i=temp; i != NULL; i = i->next){
-		 	for(j=i->next; j != NULL; j = j->next){
-		
-				if(((i->burst)) < ((j->burst))){
-			struct node* temp2 = createNode(i->processno, i->arrival, i->burst, i->priority);
-			i->processno = j->processno;
-			i->arrival = j->arrival;
-			i->burst = j->burst;
-			i->priority = j->priority;
-		
-			j->processno = temp2->processno;
-			j->arrival = temp2->arrival;
-			j->burst = temp2->burst;
-			j->priority = temp2->priority;
-			
-		}
-	}
-     
-
-}
-return temp;
-}
-
-void display(struct node *header)
-
-{
-    if (header == NULL)
-        cout << "List is empty" << endl;
-        
-    struct node* temp = header;
-
-    while (temp != NULL)
-    {
-        
-        cout<<temp->burst<<"-->";
-        
-        
-        temp=temp->next;
-        
-    }
-    cout << endl;
-}
-struct node* FCFS(struct node* header){
-	int process = 0;
-	float average; 
-	int wt = 0;
-	int currentTime = 0;
-	header = sortArrival(header);
-	
-	struct node* temp = header;
-	struct node* anothertemp = header;
-	while(!is_empty(temp)){
-	 process+=1;
-	 
-	 if(temp->arrival>currentTime){
-	 	currentTime +=1;
-	 
-	 	 continue;
-	 }
-	
-	
-	currentTime += temp->burst;
-	temp->completiontime = currentTime;
-	temp->turnAround = temp->completiontime - temp->arrival;
-	temp->waiting = temp->turnAround - temp->burst;
-	wt+= temp->waiting;
-	if(temp->next!= NULL)
-		temp=temp->next;
-		
-		else
-		break;
-}
-average = (float)wt/process;
-
-sortProcess(header);
-ofstream myFile("output1.txt");
-myFile<<"\nScheduling method: \n";
-while(!is_empty(anothertemp)){
-	myFile <<"p"	<<anothertemp->processno<<":"<<anothertemp->waiting<<"ms\n";
-	anothertemp = anothertemp->next;
-	//display(anothertemp);
-}
-myFile<<"average waiting time"<<average<<"ms\n";
-myFile.close();
-}
-void swap(struct node* head){
-
- node* temp = head; 
-  
-    // Traverse the List 
-    while (temp) { 
-        node* min = temp; 
-        node* r = temp->next; 
-        node*h = temp->next;
-  
-        // Traverse the unsorted sublist 
-        while (r) { 
-            if (min->burst > r->burst) 
-                min = r; 
-  
-            r = r->next; 
-        } 
-        
-        
-        // Swap Data 
-        int x = temp->burst; 
-        temp->burst= min->burst; 
-        min->burst= x; 
-        temp = temp->next; 
-        
-        
-    } 
-   
-
-}
-void swap1(struct node* head){
-
- node* temp = head; 
-  
-    // Traverse the List 
-    while (temp) { 
-        node* min = temp; 
-        node* r = temp->next; 
-  
-        // Traverse the unsorted sublist 
-        while (r) { 
-            if (min->arrival > r->arrival) 
-                min = r; 
-  
-            r = r->next; 
-        } 
-  
-        // Swap Data 
-        int x = temp->arrival; 
-        temp->arrival= min->arrival; 
-        min->arrival= x; 
-        temp = temp->next;
-		
-		 
-        
-        
-        
-    } 
-   
-
-}
-
-
-struct node* SJF(struct node* header){
-	int process = 0;
-	float average; 
-	int wt = 0;
-	int currentTime = 0;
-	swap(header);
-	
-	struct node* temp = header;
-	struct node* anothertemp = header;
-	while(!is_empty(temp)){
-	 process+=1;
-	 
-	 if(temp->arrival>currentTime){
-	 	currentTime +=1;
-	 
-	 	 continue;
-	 }
-	
-	
-	currentTime += temp->burst;
-	temp->completiontime = currentTime;
-	temp->turnAround = temp->completiontime - temp->arrival;
-	temp->waiting = temp->turnAround - temp->burst;
-	wt+= temp->waiting;
-	if(temp->next!= NULL)
-		temp=temp->next;
-		
-		else
-		break;
-}
-average = (float)wt/process;
-
-sortProcess(header);
-ofstream myFile("output1.txt");
-myFile<<"\nScheduling method: \n";
-while(!is_empty(anothertemp)){
-	myFile <<"p"	<<anothertemp->processno<<":"<<anothertemp->waiting<<"ms\n";
-	anothertemp = anothertemp->next;
-	//display(anothertemp);
-}
-myFile<<"average waiting time"<<average<<"ms\n";
-myFile.close();
-	
-}
-
-/*/
-struct node* dSJF(struct node* header){
-		int process = 0;
-	float average; 
-	int wt = 0;
-	int currentTime = 0;
-	
-	   
-	struct node* temp = header;
-
-
-	
-	struct node* anothertemp = header;
-	while(!is_empty(temp)){
-	 process+=1;
-
-	 	 if(temp->arrival>currentTime){
-	 	currentTime +=1;
-	 	 
-	  
-	 	 continue;
-	 }
-	
-	
-    currentTime+= temp->burst;
-	temp->completiontime = currentTime;
-	temp->turnAround = temp->completiontime- temp->arrival;
-	temp->waiting = temp->turnAround - temp->burst;
-	wt+= temp->waiting + temp->arrival;
-	if(temp->next!= NULL)
-		temp=temp->next;
-		
-		else
-		break;
-
-}
-average = (float)wt/process;
-
-
-ofstream myFile("output1.txt");
-myFile<<"\nScheduling method: \n";
-while(!is_empty(anothertemp)){
-	myFile <<"p"	<<anothertemp->processno<<":"<<anothertemp->waiting<<"ms\n";
-	anothertemp = anothertemp->next;
-	//display(anothertemp);
-}
-myFile<<"average waiting time"<<average<<"ms\n";
-myFile.close();
-	
-	
-}
-/*/
-void SJsF(struct node* header){
-			struct node* result = NULL;
-			struct node* temp;
-	int processCount = 0;
-	float totalBurstTime = 0;
-	for (struct node* j=header; j != NULL; j = j->next){
-		processCount++;
-		totalBurstTime += j->burst;
-		
-}
-display(header);cout << "pre sort";
-for(int i=0; i < processCount; i++) {
-	int min = 1000;
-	struct node* temp= NULL;
-	for(struct node* j=header; j != NULL; j = j->next){
-		if (j->burst <= min){
-		    temp = j;
-		    min = j->burst;
-		}
-	}
-		    
-		    struct node* q = NULL;
-		    struct node* r = NULL;
-		    q = temp->next;
-		    r = temp->prev;
-		    if (r != NULL) {
-		    	r->next = q;
-			}
-			
-		    if (q != NULL) {
-		    	q->prev = r;
-			}
-		
-
-       if(result != NULL){
-       	insertBack(result, temp->processno, temp->arrival, temp->burst, temp->priority);
-	   } else {
-	   	result = temp;
-	   }
-}
-
-display(result);cout << "post sort";
-int n = processCount;
-    float averagetotal, total, averagetat, totalWait =0;
-    total = 0;
-    cout << "============================Scheduling chart===============================" << endl;
-    cout << "\n process\tBurst Time\twaiting Time\t turnaroundtime";
-    int wait =0;
-    int count =0;
-    for(struct node* c=result; c != NULL; c = c->next){
-    	
-    	if( count != 0) {
-    		struct node* x = c;
-    		while ( x->prev != NULL ) {
-    		wait += x->prev ->burst;
-    		x = x->prev;
-			}
-    			totalWait += wait;
-		}
-	
-	      
-		count +=1;
-        c->turnAround =  wait + c->burst ;
-        total += c->turnAround;
-  
-        cout << "\np " << c->processno << "\t\t" << c->burst << "\t\t" << wait<< "\t\t" << c->turnAround << endl;
-   
-}
-    averagetat = (float)total / processCount;
-    averagetotal = totalWait / n;
-    cout << "average waiting time is " << averagetotal << endl;
-    cout << "average turn Around time  is" << averagetat << endl;
-    
-
-    
-
-ofstream myFile("output1.txt");
-myFile<<"\nSJF method: \n";
-while(!is_empty(result)){
-	myFile <<"p"	<<result->processno<<":"<<result->waiting<<"ms\n";
-result = result->next;
-}
-
-	display(result);
-
-myFile.close();
-
-}
-
-	 
-struct node* sortPriority(struct node* header){
-struct node* temp = header;
-	struct node* i = temp;
-	struct node* j = temp->next;
-	for(i=temp; i != NULL; i = i->next){
-		for(j=i->next; j != NULL; j = j->next){
-			if(((i->priority)) > ((j->priority+1))){
-			
-			struct node* temp2 = createNode(i->processno, i->arrival, i->burst, i->priority);
-			i->processno = j->processno;
-			i->arrival = j->arrival;
-			i->burst = j->burst;
-			i->priority = j->priority;
-		
-			j->processno = temp2->processno;
-			j->arrival = temp2->arrival;
-			j->burst = temp2->burst;
-			j->priority = temp2->priority;
-			
-		}
-		}
-	}
-	return temp;
-	
-}
-	
-    
-
-struct node* priority(struct node* header){
-
-	int waiting = 0;
-	int total = 0;
-	int averagewaiting = 0;
-	int process = 0;
-	int currentTime = 0;
-	int wt = 0;
-	int average = 0;
-     header = sortArrival(header);
-	struct node* temp = header;
-		struct node* anothertemp = header;
-	while(!is_empty(temp)){
-	 process++;
-	 
-	 if(temp->arrival>currentTime){
-	 	currentTime +=1;
-	 	 
-	 	
-	 	
-	 	 continue;
-	 }
-	
-	int c=0; int b=0;
-		
-	currentTime += temp->burst;
-	temp->completiontime = currentTime;
-	temp->turnAround = temp->completiontime - temp->arrival;
-
-	temp->waiting = (temp->burst + temp->arrival + temp->waiting)- temp->arrival;
-	wt+= temp->waiting;
-	if(temp->next!= NULL)
-		temp=temp->next;
-		
-		else
-		break;
-}
-average = (float)wt/process;
-sortProcess(header);
-
-ofstream myFile("output1.txt");
-myFile<<"\nSmethod: \n";
-while(!is_empty(anothertemp)){
-	myFile <<"p"	<<anothertemp->processno<<":"<<anothertemp->waiting<<"ms\n";
-	anothertemp = anothertemp->next;
-	//display(anothertemp);
-}
-myFile<<"average waiting time"<<average<<"ms\n";
-myFile.close();
-		
-
-     
-}	
-	
-    
-
-
+class Method{
+ 
+      
+   public:
+       Method(){};
+       void swappingval(deque<node>::iterator num1, deque<node>::iterator num2);
+       void display_original();
+       void Display();
+       void FirstComeFirstServe(int process);
+       void shortestjobfirstNP(int process);
+       void Enterval(node data);
+       void PriorityNonPremptive(int process);
+       void RoundRobin(int quantum, int process);
+      
+         
+	private:
+       deque<node> Processid;
+       deque<node> Processchange;
+       vector<node>completed;
+       deque<node> burstProcess;
+      
+};
 
 int main(){
-	struct node* header = NULL;
-	
-		
-		FILE *fp;
-	char line[LINE_MAX];
-	unsigned int num[3];
-	int process = 0;
-
-	if ((fp = fopen("input.txt", "r")) == NULL){
-			cout <<"can't open file input.txt"<<endl;
-			exit(1);
-	}
-			
-	while (fgets(line, LINE_MAX, fp) != NULL) {
-		process++;
-		
-		sscanf(line,"%d:%d:%d\n",&num[0],&num[1],&num[2]);
-		header = insertBack(header, process, num[1], num[0], num[2]);
-		cout<<num[0];
-		
-		
-				
-	}
-	fclose(fp);
-    int choice;
+ 
+   
+  
+   Method show;
+  
+    struct node data;
+    FILE *fp;
+   char line[LINE_MAX];
+  unsigned int num[3];
+    int process = 0;
+  if ((fp = fopen("input.txt", "r")) == NULL)
+        return 0 ;
+  while (fgets(line, LINE_MAX, fp) != NULL) {
+        sscanf(line,"%d:%d:%d\n",&num[0],&num[1],&num[2]);
+        data.id= process+=1;
+        data.burst = num[0];
+           data.arrive = num[1];
+           data.priority = num[2];
+           show.Enterval(data);
+}
+fclose(fp);
+ int choice;
     while(1){
     	
     	cout<<"............................................."<<endl;
@@ -573,6 +76,7 @@ int main(){
     	cout<<"4) Show Result"<<endl;
     	cout<<"5) End Program"<<endl;
     	cout<<"Option"<<endl;
+    		int quantun = 2;
     	cin>>choice;
     	switch(choice){
     		case 1:
@@ -584,31 +88,40 @@ int main(){
     			 int option;
     			 cin>>option;
     			if(option == 1){
-    				FCFS(header);
+    				show.FirstComeFirstServe(process);
 				}
 				else if(option == 2){
-					SJF(header);
-				     display(header);
+					show.shortestjobfirstNP(process);
+				  
 					
 				}
 				else if(option == 3){
-					priority(header);
+					show.PriorityNonPremptive(process);
 				}
 				else if(option == 4){
+				
+					show.RoundRobin(quantun, process);
 					
 				}
     		
     			break;
     		case 2: 
 			 cout<<"non premeptive"<<endl;	
-			 
-			 break;
+			     break;  
 			 
 			 case 3:
 			 	cout<<"preemptive"<<endl;
-			 	break;
+			 	  
+			     	show.FirstComeFirstServe(process);
+			     	show.shortestjobfirstNP(process);
+			     	show.PriorityNonPremptive(process);
+			     	show.RoundRobin(quantun, process);
+			     	
+			        break;
+			 	
 			 	
 			 	case 4: cout<<"show result"<<endl;
+			 	 show.display_original(); 
 			 	break;
 			 	
 			 	case 5:
@@ -616,11 +129,288 @@ int main(){
 		}
     	
 	}
-
-
-
-
-        
-	
-return 0;
+  
+  
+ 
+  
+   
+   return 0;
 }
+void Method::Display(){
+  
+   cout << "Process Waiting Times:" <<endl;
+  
+   for (int i = 0; i < completed.size(); i++){
+       cout << "P" << completed[i].id <<":" << " "<< completed[i].waiting << endl;
+   }
+   cout << endl;
+}
+
+
+
+void Method::display_original(){
+  
+   cout  << "Process" << endl;
+  
+   for (int i = 0; i < Processid.size(); i++){
+       cout  <<"P" << Processid[i].id <<" "<<Processid[i].arrive <<" "<< Processid[i].burst << " "<< Processid[i].priority << endl;
+   }
+   cout << endl;
+}
+
+void Method::swappingval(deque<node>::iterator num1, deque<node>::iterator num2){
+   deque<node>::iterator temp = num1;
+   num1 = num2;
+   num2 = temp;
+}
+
+
+bool sortArrival(const node a, const node b){
+   return a.arrive < b.arrive;
+}
+
+void Method::Enterval(node data){
+  
+   Processid.push_back(data);
+   Processchange.push_back(data);
+   burstProcess.push_back(data);
+}
+
+bool sortBurst(const node a, const node b){
+   return a.burst < b.burst;
+}
+
+bool sortPriority(const node a, const node b){
+   return a.priority < b.priority;
+}
+
+void Method::FirstComeFirstServe(int process){
+  
+   sort(Processid.begin(), Processid.end(), sortArrival);
+   int time = 0;
+   float average = 0, waitingtime;
+   deque<node>::iterator num;
+   for (num = Processid.begin(); num != Processid.end(); num++){
+       time += num->burst;
+       num->waiting = time - num->arrive - num->burst;
+       num->turnaroundtime = time - num->arrive;
+       waitingtime += num->waiting;
+       
+       completed.push_back((*num));
+   }
+       cout << " First Come First Served: " << endl;
+       
+       average = (float)waitingtime/process;
+   
+   
+  
+  
+      for (int i = 0; i < completed.size(); i++){
+       cout << "P" << completed[i].id <<":" << " "<< completed[i].waiting << endl;
+   }
+    cout<<"Average waiting time:"<<average;
+   cout << endl;
+   
+      
+      
+       for (num = Processid.begin(); num != Processid.end(); num++){
+           num->waiting = 0;
+           num->turnaroundtime = 0;
+       }
+      
+       completed.clear();
+}
+
+
+void Method::RoundRobin(int quantum, int process){
+   int burstmain[10];
+   sort(Processchange.begin(), Processchange.end(), sortArrival);
+   int time = 0; float average = 0, waitingtime = 0;
+   
+  
+ 
+   for (deque<node>::iterator current = Processchange.begin(); current != Processchange.end(); current++){
+       burstmain[current->id] = current->burst;
+   }
+  
+   deque<node>::iterator num;
+   for (num = Processchange.begin(); num != Processchange.end() ; num++){
+       
+       if (num->burst <= quantum){
+           time += num->burst;
+           num->waiting += time - num->arrive - burstmain[num->id];
+           num->turnaroundtime += time - num->arrive;
+           waitingtime+=num->waiting;
+           completed.push_back((*num));
+       }
+       
+       else{
+           time += quantum;
+           num->burst -= quantum;
+           Processchange.push_back((*num));
+       }
+   }
+   cout << "Round Robin Scheduling–time_quantum=2 : " << endl;
+    average = (float)waitingtime/process;
+   
+   
+
+  
+      for (int i = 0; i < completed.size(); i++){
+       cout << "P" << completed[i].id <<":" << " "<< completed[i].waiting << endl;
+   }
+    cout<<"Average waiting time:"<<average;
+   cout << endl;
+   
+  
+   
+}
+void Method::PriorityNonPremptive(int process){
+  
+sort(Processid.begin(), Processid.end(), sortArrival);
+  
+   deque<node>::iterator num;
+   bool checked[10]; float average, waitingtime;
+   deque<node>type;
+   type.push_back((*Processid.begin()));
+  
+   int time = Processid.begin()->burst;
+   Processid.begin()->waiting += time - Processid.begin()->burst - Processid.begin()->arrive;
+   Processid.begin()->turnaroundtime += time - Processid.begin()->arrive;
+   
+   completed.push_back((*Processid.begin()));
+  
+    
+  
+   for (int i = 0; i < 10; i++){
+       checked[i] = false;
+   }
+  
+   while (type.size()){
+      
+       if (type.front().arrive == Processid.begin()->arrive){
+           type.pop_front();
+       }
+      
+       for (num = Processid.begin() + 1; num != Processid.end(); num++){
+           
+           if (num->arrive <= time && checked[num->id] == false){
+               type.push_back((*num));
+               checked[num->id] = true;
+           }
+       }
+      
+       sort (type.begin(), type.end(), sortPriority);
+       deque<node>::iterator end = type.begin();
+      
+       time += end->burst;
+       end->waiting += time - end->burst - end->arrive;
+       end->turnaroundtime += time - end->arrive;
+       waitingtime+= end->waiting;
+      
+       completed.push_back((*end));
+      
+       type.pop_front();
+   }
+  
+
+  
+    average = (float)waitingtime/process;
+   
+   
+   cout << "Priority Scheduling Non-Preemptive: " << endl;
+  
+      for (int i = 0; i < completed.size(); i++){
+       cout << "P" << completed[i].id <<":" << " "<< completed[i].waiting << endl;
+   }
+    cout<<"Average waiting time:"<<average;
+   cout << endl;
+   
+  
+   for (num = Processid.begin(); num != Processid.end(); num++){
+           num->waiting = 0;
+           num->turnaroundtime = 0;
+       }
+  
+   completed.clear();
+}
+void Method::shortestjobfirstNP(int process){
+
+
+   sort(Processid.begin(), Processid.end(), sortArrival);
+  
+   deque<node>::iterator num, start = Processid.begin();
+  
+  
+   deque<node> type;
+   type.push_back((*start));
+    bool checked[10];
+    float average = 0, waitingtime = 0;
+   int time = start->burst;
+   start->waiting += time - start->burst - start->arrive;
+   start->turnaroundtime += time - start->arrive;
+  
+   completed.push_back((*start));
+  
+   
+  
+   for (int i = 0; i < 10; i++){
+       checked[i] = false;
+       
+   }
+
+   while (type.size()){
+   	     
+    
+       if (type.front().arrive == Processid.begin()->arrive){
+           type.pop_front();
+       }
+      
+       for (num = Processid.begin() + 1; num != Processid.end(); num++){
+           
+           
+           if (num->arrive <= time && checked[num->id] == false){
+               type.push_back((*num));
+               checked[num->id] = true;
+           }
+       }
+       
+       sort (type.begin(), type.end(), sortBurst);
+       deque<node>::iterator end = type.begin();
+      
+       time += end-> burst;
+       end->waiting += time - end->burst - end->arrive;
+       end->turnaroundtime += time - end->arrive;
+       waitingtime += end->waiting;
+        
+       completed.push_back((*end));
+      
+       type.pop_front();
+   }
+   
+   average = (float)waitingtime/process;
+   
+   
+   cout << "Shortest Job First NonPreemptive: " << endl;
+  
+      for (int i = 0; i < completed.size(); i++){
+       cout << "P" << completed[i].id <<":" << completed[i].waiting << endl;
+   }
+    cout<<"Average waiting time:"<<average;
+   cout << endl;
+   
+  
+   for (num = Processid.begin(); num != Processid.end(); num++){
+           num->waiting = 0;
+           num->turnaroundtime = 0;
+           
+       }
+       
+      
+   completed.clear();
+}
+
+
+
+
+  
