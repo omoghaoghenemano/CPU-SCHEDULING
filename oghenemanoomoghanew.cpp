@@ -3,9 +3,10 @@
 #include<algorithm>
 #include<vector>
 #include<deque>
-//sir please permit me to use deque library and vector
 #include<fstream>
 #define LINE_MAX 3000
+//Created by Oghenemano omogha
+
 
 using namespace std;
 
@@ -306,7 +307,7 @@ void CPU::RoundRobin(int quantum, int process){
 	     myfile2.open("output.txt",ios::app);
 	 }
         myfile2<<"------------------------"<<endl;
-   myfile2<< "RoundRobinScheduling–time_quantum=2:" << endl;
+   myfile2<< "RoundRobinSchedulingâ€“time_quantum=2:" << endl;
     average = (float)waitingtime/process;
    
    
